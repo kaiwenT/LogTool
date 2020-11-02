@@ -12,15 +12,10 @@ import java.util.*;
 public class MainApp implements CmdCallback{
     private static WeakReference<MainApp> reference;
 
-    private CmdExecutor cmdExecutor;
-
-    private List<String> devSerialNums;
-
-    private List<String> devNames;
+    private CmdController cmdController;
 
     private MainApp() {
-        devSerialNums = new ArrayList<>();
-        devNames = new ArrayList<>();
+        cmdController = new CmdController(this);
     }
 
     public static MainApp getInstance() {
@@ -29,30 +24,6 @@ public class MainApp implements CmdCallback{
         }
         return reference.get();
     }
-
-    public void getLogs() {
-        String appName = "";
-        String mainLogDir = "D:\\00_日志";
-
-        String appDir = mainLogDir + File.pathSeparator + appName;
-        Utils.mkdir(appDir);
-
-        String timeStr = Utils.getSysTimeStr();
-        String logDir = appDir + File.pathSeparator + "LOGS" + timeStr;
-        Utils.mkdir(logDir);
-
-        cmdExecutor = new GetDevicesExecutor();
-        String serialNumber = "serialNumber";
-        cmdExecutor.execCmd(serialNumber, "", logDir, this);
-    }
-
-    public void getDevices() {
-        devSerialNums.clear();
-        cmdExecutor = new GetDevicesExecutor();
-        cmdExecutor.execCmd(null, null, null, this);
-    }
-
-
 
     public static void main(String[] args) throws Exception {
         System.out.println(UUID.randomUUID());
@@ -76,8 +47,8 @@ public class MainApp implements CmdCallback{
             return;
         }
 
-        devNames.add(results.get(0));
-        if (devNames.size() == devSerialNums.size()) {
+        cmdController.addDevName(results.get(0));
+        if (cmdController.isNameMatchSn()) {
             // 显示到JCombox
         }
     }
@@ -88,17 +59,12 @@ public class MainApp implements CmdCallback{
         }
         results.remove(0);
 
-        devNames.clear();
+        cmdController.clearDevNames();
 
         for (String sn : results) {
-            devSerialNums.add(sn);
-            getDeviceName(sn);
+            cmdController.addDevSerialNum(sn);
+            cmdController.getDeviceName(sn);
         }
-    }
-
-    private void getDeviceName(String sn) {
-        cmdExecutor = new GetDevNameExecutor();
-        cmdExecutor.execCmd(sn, "", null, this);
     }
 }
 

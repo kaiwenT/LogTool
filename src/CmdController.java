@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CmdController {
@@ -12,8 +13,37 @@ public class CmdController {
 
     public CmdController(CmdCallback callback) {
         this.callback = callback;
+        devSerialNums = new ArrayList<>();
+        devNames = new ArrayList<>();
     }
 
+    public List<String> getDevSerialNums() {
+        return devSerialNums;
+    }
+
+    public void clearDevSerialNums() {
+        devSerialNums.clear();
+    }
+
+    public void addDevSerialNum(String sn) {
+        devSerialNums.add(sn);
+    }
+
+    public List<String> getDevNames() {
+        return devNames;
+    }
+
+    public void addDevName(String sn) {
+        devNames.add(sn);
+    }
+
+    public void clearDevNames() {
+        devNames.clear();
+    }
+
+    public boolean isNameMatchSn() {
+        return devNames.size() == devSerialNums.size();
+    }
 
     public void getLogs() {
         String appName = "";
@@ -37,7 +67,7 @@ public class CmdController {
         cmdExecutor.execCmd(null, null, null, callback);
     }
 
-    private void getDeviceName(String sn) {
+    public void getDeviceName(String sn) {
         cmdExecutor = new GetDevNameExecutor();
         cmdExecutor.execCmd(sn, "", null, callback);
     }
